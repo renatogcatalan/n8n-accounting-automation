@@ -1,0 +1,4668 @@
+{
+  "name": "Contabilidad Automática",
+  "nodes": [
+    {
+      "parameters": {
+        "content": "## Settings para este work flow \n* activar ngrok http 5678 en un powershell\n* en otro powershell: \nset WEBHOOK_URL=https://xxxx-xxxx-xxxx.ngrok-free.app\nn8n start\n",
+        "width": 736
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2192,
+        3248
+      ],
+      "typeVersion": 1,
+      "id": "034ae6d1-12a6-4487-a723-4440fc84c852",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "973547f5-af5d-4d3e-b96d-57c98c61a4df",
+              "name": "chat ID",
+              "value": "={{ $json.message.from.id }}",
+              "type": "number"
+            },
+            {
+              "id": "a1a8dd27-4b71-4118-bfdb-0a75baef95df",
+              "name": "text",
+              "value": "={{ $json.message.text.toLowerCase() }}",
+              "type": "string"
+            },
+            {
+              "id": "99c08e13-aca2-4952-8bfd-3ff8da11e2d4",
+              "name": "date",
+              "value": "={{ DateTime.fromSeconds($json.message.date).toISO() }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        -576,
+        3248
+      ],
+      "id": "18fa1451-6d70-4985-99b8-40e8bcf8fe4f",
+      "name": "Extraer datos"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "ContaBot_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -96,
+        3248
+      ],
+      "id": "7087b60d-aa94-4d57-9ee5-40d66063411c",
+      "name": "Leer Estado"
+    },
+    {
+      "parameters": {
+        "updates": [
+          "message",
+          "callback_query"
+        ],
+        "additionalFields": {}
+      },
+      "type": "n8n-nodes-base.telegramTrigger",
+      "typeVersion": 1.2,
+      "position": [
+        -784,
+        3248
+      ],
+      "id": "da84adda-2b6b-465f-b7d7-397b83993755",
+      "name": "Telegram - Recibir Mensaje",
+      "webhookId": "f5a3e103-a8aa-42e3-bf29-9bab1edb6b0b",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        656
+      ],
+      "id": "6063143b-0b69-49bb-9da3-9e062e716335",
+      "name": "Google LLM1",
+      "notesInFlow": false,
+      "credentials": {
+        "googlePalmApi": {
+          "id": "Uk1ma2Oonu5EkAtD",
+          "name": "Google AI Studio API"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "IOzcC5945cgttnJB",
+          "mode": "list",
+          "cachedResultName": "ContaBot_Response_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/IOzcC5945cgttnJB"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Response": "={{ $('Contabilizador de Transacción').item.json.output }}"
+          },
+          "matchingColumns": [
+            "Response"
+          ],
+          "schema": [
+            {
+              "id": "Response",
+              "displayName": "Response",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "dryRun": false
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1872,
+        448
+      ],
+      "id": "cd86f5fe-c582-4688-836e-223b2ea3cb05",
+      "name": "Actualizar caché respuesta"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "IOzcC5945cgttnJB",
+          "mode": "list",
+          "cachedResultName": "ContaBot_Response_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/IOzcC5945cgttnJB"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1248,
+        2320
+      ],
+      "id": "65836e50-224b-4ae5-a2d2-f7f925922f97",
+      "name": "Leer caché respuesta",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
+      "typeVersion": 1,
+      "position": [
+        1808,
+        3712
+      ],
+      "id": "cb66f8d1-085a-4bdc-a77a-bf5cf23d8dd8",
+      "name": "Google LLM2",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "qEjrBIsS4hBAK1FS",
+          "name": "Google IA Studio API 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "IOzcC5945cgttnJB",
+          "mode": "list",
+          "cachedResultName": "ContaBot_Response_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/IOzcC5945cgttnJB"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1312,
+        3504
+      ],
+      "id": "a3257e28-af3a-4ad4-8acf-1e4c4be85ddd",
+      "name": "Leer caché respuesta1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\n\ntexto = _input.first().json.Response\n\ntry:\n    data = json.loads(texto)\nexcept json.JSONDecodeError:\n    raise ValueError(\"El texto no es un JSON válido\")\n\nreturn data\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1456,
+        2320
+      ],
+      "id": "570c7ad2-98bf-45bf-9d38-9cb65eb89c37",
+      "name": "Estructurar Respuesta",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "=2103298112",
+        "text": "=¿Se desea rectificar la transacción o abortar y guardar como fallida?\n(r: rectificar | a: abortar)",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        3088
+      ],
+      "id": "5e6eea3a-4dc1-4b4b-aa5d-8907577c60c3",
+      "name": "Preguntar si hacer cambios o abortar",
+      "webhookId": "a07c379c-a008-49e9-90d5-ce9f72b3591c",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN REVISION",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "62ac5b5e-4173-400e-ad70-071af0a7784e",
+              "leftValue": "={{ $('Telegram - Recibir Mensaje').item.json.message.text.toLowerCase() }}",
+              "rightValue": "n",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        3088
+      ],
+      "id": "02827033-269a-4936-a09b-ea5dcce33ec2",
+      "name": "Proceso Rectificación: pregunta"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN RECTIFICACION PREGUNTA",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "62ac5b5e-4173-400e-ad70-071af0a7784e",
+              "leftValue": "={{ $('Telegram - Recibir Mensaje').item.json.message.text.toLowerCase() }}",
+              "rightValue": "r",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        3296
+      ],
+      "id": "c78484a1-b1a1-43dd-8adb-49798e157197",
+      "name": "Proceso Rectificación: Pedir sugerencias"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extraer datos').item.json['chat ID'] }}",
+        "text": "¿Qué rectificaciones se sugieren?",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        3296
+      ],
+      "id": "e8dec66b-8f50-4928-b260-2f830a452ba6",
+      "name": "Pedir rectificaciones",
+      "webhookId": "4ede61fa-62da-4f07-a4a9-33d6c29605f9",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN RECTIFICACION",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        3504
+      ],
+      "id": "e5b11348-df4a-4cd5-987d-89d3325efad6",
+      "name": "Proceso Rectificación: Rectificar"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5lEvkQNU1jEVZU9O",
+          "mode": "list",
+          "cachedResultName": "ContaBot_Original_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/5lEvkQNU1jEVZU9O"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "texto_original": "={{ $('Extraer datos').item.json.text }}"
+          },
+          "matchingColumns": [
+            "texto_original"
+          ],
+          "schema": [
+            {
+              "id": "texto_original",
+              "displayName": "texto_original",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2080,
+        448
+      ],
+      "id": "2aa0cd99-7307-429f-b6c6-f5ce6d738831",
+      "name": "Actualizar caché texto original"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5lEvkQNU1jEVZU9O",
+          "mode": "list",
+          "cachedResultName": "ContaBot_Original_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/5lEvkQNU1jEVZU9O"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        3504
+      ],
+      "id": "c9655b6f-95ce-40ea-8ef6-7d20ad295302",
+      "name": "Leer caché texto original"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN ESPERA"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2832,
+        2224
+      ],
+      "id": "668aefe3-548d-4e46-892b-ce2d5a8e39ac",
+      "name": "Actualizar estado: En espera",
+      "executeOnce": true
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "ad10beb3-4c42-4b58-8f28-304b9c2dfcdd",
+              "leftValue": "={{ $json.text.toLowerCase() }}",
+              "rightValue": "exit",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        -384,
+        3248
+      ],
+      "id": "eccf3eb1-733c-40d9-8f0e-4e1e82f727c5",
+      "name": "¿Continuar?"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN ESPERA"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -784,
+        3504
+      ],
+      "id": "40ccd64f-673a-4bf9-835f-da7bd54ceb62",
+      "name": "Resetear estado: En espera"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Telegram - Recibir Mensaje').item.json.message.from.id }}",
+        "text": "Contabilización cancelada ✖️",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        -384,
+        3504
+      ],
+      "id": "698f80e8-e390-4788-b607-b1f63845752c",
+      "name": "Enviar mensaje terminación",
+      "webhookId": "c065522a-0812-4e6b-9949-faddfb9b2943",
+      "executeOnce": true,
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "2103298112",
+        "text": "=Transacción ↔️💰\n\n▶️ Tipo movimiento: {{ $('Limpiar respuesta reparador').item.json.data.tipo_movimiento }}\n\n▶️ Asientos:\n{{ $('Limpiar respuesta reparador').item.json.data.asientos.map(a => `- ${a.cuenta} | ${a.lado} | $${a.monto}`).join(\"\\n\") }}\n\n▶️ Explicación:\n{{ $('Limpiar respuesta reparador').item.json.data.explicacion }}\n\n¿Se desea continuar la contabilización de la transacción con este JSON? (y/n)",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2640,
+        3504
+      ],
+      "id": "e3dbbd3f-a069-4547-a523-8c47f5868c3a",
+      "name": "Mostrar nuevo JSON y pedir aprobación",
+      "webhookId": "55a90b3e-1bbf-4032-96e3-4bb2b15f15a5",
+      "alwaysOutputData": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN REVISION"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2400,
+        3504
+      ],
+      "id": "946f9047-a56e-483f-932b-b1950ae6bc5f",
+      "name": "Actualizar estado: volver a revisión"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "ContaBot_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Leer Estado').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN RECTIFICACION"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        3296
+      ],
+      "id": "5f309283-9a25-4d24-ba50-03d5a795989c",
+      "name": "Actualizar estado: En rectificación"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN RECTIFICACION PREGUNTA",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "b17a2d25-00c2-4721-bf2f-fccf23f7ab57",
+              "leftValue": "={{ $('Extraer datos').item.json.text }}",
+              "rightValue": "a",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        4144
+      ],
+      "id": "7a42f603-04a8-417d-a750-ef349e0d4cfe",
+      "name": "Proceso Rectificación: Abortar"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN ESPERA"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        4144
+      ],
+      "id": "7471f457-8e29-4d24-bf08-ec35b354951d",
+      "name": "Actualizar estado: En espera1"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "list",
+          "cachedResultName": "contabilidad"
+        },
+        "table": {
+          "__rl": true,
+          "value": "trans_fallidas",
+          "mode": "list",
+          "cachedResultName": "trans_fallidas"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "texto_original": "={{ $('Leer caché texto original1').item.json.texto_original }}",
+            "json_generado": "={{ $json.Response }}",
+            "fecha_evento": "={{ DateTime.fromISO($json.updatedAt) }}",
+            "created_at": "={{ $now.toISO() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "texto_original",
+              "displayName": "texto_original",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "json_generado",
+              "displayName": "json_generado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "error",
+              "displayName": "error",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "estado",
+              "displayName": "estado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha_evento",
+              "displayName": "fecha_evento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1760,
+        4144
+      ],
+      "id": "fa2ae598-ab4b-4085-a8a5-6064cc99072f",
+      "name": "Guardar Transacción Fallida",
+      "credentials": {
+        "postgres": {
+          "id": "wSD7a2Y8Y1d5TlRy",
+          "name": "Postgres account Local"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5lEvkQNU1jEVZU9O",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_Original_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/5lEvkQNU1jEVZU9O"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1296,
+        4144
+      ],
+      "id": "2cdca33c-3689-476b-9d4e-c2df1f19eaec",
+      "name": "Leer caché texto original1"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "IOzcC5945cgttnJB",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_Response_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/IOzcC5945cgttnJB"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1520,
+        4144
+      ],
+      "id": "132d4aa6-ddc5-4a28-879b-1635eabec2ef",
+      "name": "Leer caché respuesta2"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extraer datos').item.json['chat ID'] }}",
+        "text": "=Transacción fallida guardada y abortada con éxito 🗄️",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2016,
+        4144
+      ],
+      "id": "faf56a26-7b4d-4d7d-981f-c44e28da0402",
+      "name": "Enviar mensaje de conclusión",
+      "webhookId": "6477d561-92d6-4af7-80ec-ea5c890378fd",
+      "alwaysOutputData": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "asientos = _('Estructurar Respuesta').first().json.asientos\nid_transaccion = _input.first().json.id\n\nfor asiento in asientos:\n  asiento[\"id_trans\"] = id_transaccion\n\n\nreturn asientos"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1936,
+        2320
+      ],
+      "id": "7b9b5e63-4eef-42e0-94ac-7be6d7b908a8",
+      "name": "Fusionar ID transacción a asientos"
+    },
+    {
+      "parameters": {
+        "options": {
+          "reset": false
+        }
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        2400,
+        2320
+      ],
+      "id": "f33c74e2-c40c-416f-818b-8c543e0333f3",
+      "name": "Loop Over Items"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me",
+      "typeVersion": 1,
+      "position": [
+        2976,
+        2384
+      ],
+      "id": "3ba52319-f8a1-41ac-9a59-aa394a129818"
+    },
+    {
+      "parameters": {
+        "chatId": "2103298112",
+        "text": "=Registro contable con éxito 💰",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3232,
+        2320
+      ],
+      "id": "6631d5d4-894e-4866-8b21-7afbad683ef9",
+      "name": "Enviar mensaje de registro exitoso",
+      "webhookId": "74b0d264-cd01-46d4-8651-4fb30c1b03ac",
+      "alwaysOutputData": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95cc5747-69d9-4e26-87b0-ff96fa544376",
+              "name": "Error",
+              "value": "⚠️ El agente contabilizador ha arrojado una excepción",
+              "type": "string"
+            },
+            {
+              "id": "f83e212a-a683-4565-ab26-11dbaee968b1",
+              "name": "Proceso",
+              "value": "Proceso Contabilización - Contabilizador de Transacción",
+              "type": "string"
+            },
+            {
+              "id": "8944571b-d5df-4488-a60d-bc549230a371",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1456,
+        816
+      ],
+      "id": "c7c205e8-a014-4727-9a55-43d3a338d9f0",
+      "name": "Error: fallo contabilizador"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en la limpieza del JSON dado por el contabilizador de transacción",
+              "type": "string"
+            },
+            {
+              "id": "0b18e756-9c47-430d-8e60-bbdc2577af81",
+              "name": "Proceso",
+              "value": "Proceso Contabilización - Limpiar respuesta contabilizador",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1728,
+        816
+      ],
+      "id": "c8ac7aa5-130c-4c74-96c3-e86b014ad747",
+      "name": "Error: limpieza JSON contabilizador"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en la validación del JSON dado por el contabilizador de transacción",
+              "type": "string"
+            },
+            {
+              "id": "39ddcdfe-2af7-4822-982c-ba87b5223e27",
+              "name": "Proceso",
+              "value": "Proceso Contabilización - ¿Es JSON válido?",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1968,
+        816
+      ],
+      "id": "6dd1b384-17fb-451d-a0ce-0802aff2768c",
+      "name": "Error: validación JSON contabilizador"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en el envío de solicitud de aprobación",
+              "type": "string"
+            },
+            {
+              "id": "62d525e3-9247-4c26-b3f0-3df3608a1874",
+              "name": "Proceso",
+              "value": "Proceso Contabilización - Pedir aprobación usuario",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2656,
+        816
+      ],
+      "id": "3dfef32f-97ae-411e-9f04-881e0507acd2",
+      "name": "Error: Envío mensaje de aprobación"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en la estructuración de respuesta en caché",
+              "type": "string"
+            },
+            {
+              "id": "0770ceb3-4798-47e2-aa2d-6cb5e7e37fad",
+              "name": "Proceso",
+              "value": "Proceso Registro - Estructurar Respuesta",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1760,
+        2688
+      ],
+      "id": "49729eb0-ae7d-460c-99d2-cb0bf3d29aeb",
+      "name": "Error: Estructuración respuesta caché"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en el registro de la transacción",
+              "type": "string"
+            },
+            {
+              "id": "26801253-18f3-44c6-93e3-5d38bce27d5e",
+              "name": "Proceso",
+              "value": "Proceso Registro - Registrar Transacción",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2048,
+        2688
+      ],
+      "id": "404d3cc0-6a0a-40d1-96cc-8753e6722a20",
+      "name": "Error: Registro Transacción"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en el registro de los asientos de la transacción",
+              "type": "string"
+            },
+            {
+              "id": "bdf832e8-e742-4196-a11b-9f354d3c12c9",
+              "name": "Proceso",
+              "value": "Proceso Registro - Registrar asientos",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2992,
+        2688
+      ],
+      "id": "ebf85a61-71ff-495a-b6ec-eda214b3a85d",
+      "name": "Error: Registro asientos"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\n\nraw = _input.first().json.output\n\n# limpiar espacios y saltos de línea\nif not isinstance(raw, str):\n    return {\n        \"is_json\": False,\n        \"error\": \"La salida no es un string\",\n        \"raw\": raw\n    }\n\nraw = raw.strip()\n\ntry:\n    data = json.loads(raw)\n    return {\n        \"is_json\": True,\n        \"data\": data\n    }\nexcept json.JSONDecodeError as e:\n    return {\n        \"is_json\": False,\n        \"error\": str(e),\n        \"raw\": raw\n    }\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2160,
+        3504
+      ],
+      "id": "bb1158a3-3396-4692-aa71-f62a34215258",
+      "name": "Limpiar respuesta reparador"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\n\nraw = _input.first().json.output\n\n# limpiar espacios y saltos de línea\nif not isinstance(raw, str):\n    return {\n        \"is_json\": False,\n        \"error\": \"La salida no es un string\",\n        \"raw\": raw\n    }\n\nraw = raw.strip()\n\ntry:\n    data = json.loads(raw)\n    return {\n        \"is_json\": True,\n        \"data\": data\n    }\nexcept json.JSONDecodeError as e:\n    return {\n        \"is_json\": False,\n        \"error\": str(e),\n        \"raw\": raw\n    }\n\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1424,
+        448
+      ],
+      "id": "2428f85a-532a-4188-aa83-c418ca3131c0",
+      "name": "Limpiar respuesta contabilizador",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "import json\n\ntexto = _input.first().json.Response\n\ntry:\n    data = json.loads(texto)\nexcept json.JSONDecodeError:\n    raise ValueError(\"El texto no es un JSON válido\")\n\nreturn data\n"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1520,
+        3504
+      ],
+      "id": "5cf0fb35-f940-4b74-a53a-2a02a5dbed62",
+      "name": "Estructurar Respuesta2",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en la estructuración de respuesta en caché",
+              "type": "string"
+            },
+            {
+              "id": "8a2b3943-fe2d-4a6f-9769-fcd6bd900250",
+              "name": "Proceso",
+              "value": "Proceso Rectificación - Estructurar Respuesta2",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1808,
+        3888
+      ],
+      "id": "7c6a9876-7335-409a-88d5-394371e8b761",
+      "name": "Error: Estructuración respuesta caché1"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "95cc5747-69d9-4e26-87b0-ff96fa544376",
+              "name": "Error",
+              "value": "⚠️ El agente reparador ha arrojado una excepción",
+              "type": "string"
+            },
+            {
+              "id": "6445f6d4-fc9a-439b-bfb5-5cbbd98ac4a2",
+              "name": "Proceso",
+              "value": "Proceso Rectificación - Reparador de Transacción",
+              "type": "string"
+            },
+            {
+              "id": "8944571b-d5df-4488-a60d-bc549230a371",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2240,
+        3888
+      ],
+      "id": "60592b92-3437-4706-86bb-5daee06cac21",
+      "name": "Error: fallo reparador"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en el envío de solicitud de aprobación",
+              "type": "string"
+            },
+            {
+              "id": "f3f725f8-770a-4822-a065-fc535699eb47",
+              "name": "Proceso",
+              "value": "Proceso Rectificación - Mostrar nuevo JSON y pedir aprobación",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2928,
+        3888
+      ],
+      "id": "ba3e5620-a984-46ed-baa1-11be84effde1",
+      "name": "Error: Envío mensaje de aprobación rectificación"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Texto de la transacción:\n{{ $('Extraer datos').item.json.text }}\n",
+        "options": {
+          "systemMessage": "=Eres un analista contable especializado en clasificación y registro de transacciones para la contabilidad PERSONAL.\n\nRecibirás un texto que describe un movimiento financiero.\n\n1) Clasificación\nDetermina si el movimiento corresponde a:\n- INGRESO\n- EGRESO\n- AJUSTE\n\n2) Asientos contables\nIdentifica los dos o más asientos contables, donde cada asiento indique:\n- cuenta\n- lado (DEBE o HABER)\n- monto\n\nLas cuentas permitidas son únicamente:\n- EFE (Efectivo)\n- BCO (Banco)\n- CXC (Cuentas por Cobrar)\n- INV (Inversiones)\n- CXP (Cuentas por Pagar)\n- OBG (Obligaciones Bancarias)\n- TGC (Tarjeta de Crédito)\n- ING (Ingresos)\n- OING (Otros Ingresos)\n- GST (Gastos)\n- OGST (Otros Gastos)\n\nFormato de salida obligatorio (JSON plano):\n{\"tipo_movimiento\": \"Ingreso | Egreso | Ajuste\", \"asientos\": [{ \"cuenta\": \"EFE\", \"lado\": \"DEBE\", \"monto\": 0 }, { \"cuenta\": \"ING\", \"lado\": \"HABER\", \"monto\": 0 }], \"explicacion\": \"Explicación breve del movimiento en menos de 20 palabras\"}\n\nNo uses backticks.\nNo uses formato de código.\nNo devuelvas texto adicional.",
+          "maxIterations": 10
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1040,
+        448
+      ],
+      "id": "d2fb8ca0-67df-4ecc-be19-e7d57057dca7",
+      "name": "Contabilizador de Transacción",
+      "alwaysOutputData": false,
+      "notesInFlow": true,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "b48f6e63-b3c1-4a84-ac8b-e73f38aea567",
+              "leftValue": "={{ $json.is_json }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1632,
+        448
+      ],
+      "id": "f97991b8-95d7-4c7a-a040-ddeed057c1a7",
+      "name": "¿Es JSON válido?",
+      "alwaysOutputData": true,
+      "onError": "continueRegularOutput"
+    },
+    {
+      "parameters": {
+        "chatId": "2103298112",
+        "text": "=Transacción ↔️💰\n\n▶️ Tipo movimiento: {{ $('Limpiar respuesta contabilizador').item.json.data.tipo_movimiento }}\n\n▶️ Asientos:\n{{ $('Limpiar respuesta contabilizador').item.json.data.asientos.map(a => `- ${a.cuenta} | ${a.lado} | $${a.monto}`).join(\"\\n\") }}\n\n▶️ Explicación:\n{{ $('Limpiar respuesta contabilizador').item.json.data.explicacion }}\n\n¿Se desea continuar la contabilización de la transacción con este JSON? (y/n)\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        2304,
+        448
+      ],
+      "id": "6e526128-ba05-4e22-aca2-e6269836fe6b",
+      "name": "Pedir aprobación usuario",
+      "webhookId": "e0a6ce7a-bc64-431c-a927-4bd84b7d64ee",
+      "alwaysOutputData": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "list",
+          "cachedResultName": "contabilidad"
+        },
+        "table": {
+          "__rl": true,
+          "value": "transacciones",
+          "mode": "list",
+          "cachedResultName": "transacciones"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "fecha": "={{ $('Extraer datos').item.json.date }}",
+            "descripcion": "={{ $json.explicacion }}",
+            "created_at": "={{ $now.setZone('America/Santiago').toISO() }}",
+            "tipo_movimiento": "={{ $json.tipo_movimiento.toUpperCase() }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "fecha",
+              "displayName": "fecha",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "tipo_movimiento",
+              "displayName": "tipo_movimiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "descripcion",
+              "displayName": "descripcion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "created_at",
+              "displayName": "created_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "canBeUsedToMatch": true,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {
+          "connectionTimeout": 15,
+          "outputColumns": [
+            "id",
+            "created_at"
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        1680,
+        2320
+      ],
+      "id": "d6d04677-4cf7-4172-961a-26c1830f072d",
+      "name": "Registrar Transacción",
+      "alwaysOutputData": false,
+      "executeOnce": false,
+      "credentials": {
+        "postgres": {
+          "id": "wSD7a2Y8Y1d5TlRy",
+          "name": "Postgres account Local"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "=Eres un agente de corrección y validación de contabilidad personal.\nTu rol es revisar, corregir y normalizar JSON contables generados por otros agentes.\n\nRecibirás siempre:\n- El texto original de la transacción\n- Un JSON contable generado\n- Una lista opcional de sugerencias de corrección\n\n1) Objetivo\nEntregar un único JSON final, contablemente correcto, estructuralmente válido y alineado con el texto original.\nDebes usar criterio contable propio cuando sea necesario, sin inventar datos específicos no implícitos (fechas, montos, medios), pero sí puedes inferir la estructura contable más razonable.\n\n2) Reglas contables obligatorias\nEl movimiento debe clasificarse correctamente como:\n- INGRESO\n- EGRESO\n- AJUSTE\nLa suma del DEBE debe ser exactamente igual a la suma del HABER.\n\n3) Cada asiento debe tener:\n- cuenta válida\n- lado válido (DEBE o HABER)\n- monto numérico positivo mayor a 0\n- No deben existir cuentas duplicadas con el mismo lado.\n- El número de asientos debe ser el mínimo necesario para reflejar correctamente la transacción.\n\nSi el texto implica crédito, deuda u obligación, no usar efectivo o banco incorrectamente.\n\nSi el JSON original es inválido, incompleto o incoherente, reconstrúyelo completamente.\n\n4) Cuentas permitidas\n- EFE – Efectivo\n- BCO – Banco\n- CXC – Cuentas por Cobrar\n- INV – Inversiones\n- CXP – Cuentas por Pagar\n- OBG – Obligaciones Bancarias\n- TGC – Tarjeta de Crédito\n- ING – Ingresos\n- OING – Otros Ingresos\n- GST – Gastos\n- OGST – Otros Gastos\n\n5) Reglas de corrección y prioridad\n- Prioriza siempre el texto original de la transacción.\n- Si el texto es insuficiente o ambiguo, usa las sugerencias de corrección como fuente principal, siempre que respeten las reglas contables obligatorias.\n- Si existen múltiples sugerencias válidas, elige la más simple y con menor número de asientos.\n- Usa criterio contable propio solo cuando texto y sugerencias sean insuficientes o inconsistentes.\n\nCorrige automáticamente:\n- montos inconsistentes\n- lados invertidos\n- clasificación errónea\n- cuentas mal utilizadas\n- errores estructurales del JSON\n- asientos faltantes\n- Regla de fallback obligatorio\n\nSi no es posible determinar con certeza todos los elementos del asiento:\n- Prioriza devolver un JSON válido, balanceado y coherente\n- Usa las sugerencias disponibles\n- Aplica la estructura contable más simple compatible con el texto\n\nEn base a los siguientes datos, Entrega el JSON corregido:\n\ntexto original: \n{{ $('Leer caché texto original').first().json.texto_original }}\n\nJSON contable original: {{ $('Leer caché respuesta1').item.json.Response }}\n\nsugerencias: {{ $('Extraer datos').item.json.text }}\n\n6) Formato de salida (obligatorio)\ndebes devolver exclusivamente un JSON plano, sin texto adicional, sin explicaciones externas:\n\n{\"tipo_movimiento\":\"Ingreso | Egreso | Ajuste\",\"asientos\":[{\"cuenta\":\"EFE\",\"lado\":\"DEBE\",\"monto\":0}],\"explicacion\":\"Explicación breve del movimiento en menos de 20 palabras\"}\n\nRestricciones finales\n- No uses backticks\n- No devuelvas comentarios\n- No devuelvas múltiples versiones\n- No devuelvas texto fuera del JSON\n- El JSON debe ser directamente parseable",
+        "options": {
+          "systemMessage": "="
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3,
+      "position": [
+        1808,
+        3504
+      ],
+      "id": "33df2c77-53da-4302-aedf-c5eabbf7acc9",
+      "name": "Reparador de Transacción",
+      "executeOnce": true,
+      "alwaysOutputData": false,
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "6cb60bd5-ee16-4eab-84d7-bdd80700d7ce",
+              "name": "Error",
+              "value": "⚠️ No se ha podido guardar la transacción abortada",
+              "type": "string"
+            },
+            {
+              "id": "6445f6d4-fc9a-439b-bfb5-5cbbd98ac4a2",
+              "name": "Proceso",
+              "value": "Proceso Rectificación: Abortar - Guardar Transacción Fallida",
+              "type": "string"
+            },
+            {
+              "id": "8944571b-d5df-4488-a60d-bc549230a371",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2016,
+        4416
+      ],
+      "id": "8a65baed-98f3-4ed6-8891-0f9c841f9b54",
+      "name": "Error: guardado transacción fallida"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en el envío de mensaje",
+              "type": "string"
+            },
+            {
+              "id": "bdf832e8-e742-4196-a11b-9f354d3c12c9",
+              "name": "Proceso",
+              "value": "Proceso Registro - Envío de mensaje de registro exitoso",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        3552,
+        2688
+      ],
+      "id": "6dde3e2f-e1a2-46e5-a0e1-39f53ec083ba",
+      "name": "Error: Envío mensaje de éxito"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extraer datos').item.json['chat ID'] }}",
+        "text": "={{ $json.Error }}\n\nOrigen: \n{{ $json.Proceso }}\n\nTraceback:\n[{{ $json.Traceback }}]\n\n",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        672,
+        5248
+      ],
+      "id": "70b15e6a-51ef-405d-9527-3ff72503b66c",
+      "name": "Enviar Mensaje Error",
+      "webhookId": "eb16cb8b-6146-434b-8bca-0704a643a30d",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extraer datos').item.json['chat ID'] }}",
+        "text": "=Comando desconocido por el proceso actual.\n\nReintentar 🔄️",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        5072
+      ],
+      "id": "fe9a7380-3909-4710-bb1a-a0274acd1cd7",
+      "name": "Enviar mensaje: comando desconocido",
+      "webhookId": "51a574da-aa8b-41ec-b7d3-e737e33882f5",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extraer datos').item.json['chat ID'] }}",
+        "text": "=¿Guardar texto original para contabilizar después en base de emergencia?\n\n-si se desea guardar, ingresar 'e'\n-si no, ingresar 'exit' para resetear la contabilización",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        912,
+        5248
+      ],
+      "id": "ad486dcf-6986-4985-933f-d94513d8b018",
+      "name": "Enviar mensaje pregunta base emergencia",
+      "webhookId": "6370ea76-4e8d-41aa-b7ba-e2355c13c501",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "3d4e5f21-fe58-4dbf-95b8-1406e8f2485c",
+              "leftValue": "={{ $('Extraer datos').item.json.text }}",
+              "rightValue": "e",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        4768
+      ],
+      "id": "aa700ce8-ba2b-4f7d-a1dc-e1015652c908",
+      "name": "Proceso Guardado Emergencia"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN REVISION",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        5072
+      ],
+      "id": "738a1f6e-c52b-4aab-8621-e30386f5cd8d",
+      "name": "Proceso: Error comando"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "4785bed8-7d5d-4b1f-8da7-46971ebe6fbe",
+              "leftValue": "={{ $('Extraer datos').item.json.text.toLowerCase() }}",
+              "rightValue": "y",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "fd1be7fd-b296-4496-842b-0a4a74f04f64",
+              "leftValue": "={{ $('Extraer datos').item.json.text.toLowerCase() }}",
+              "rightValue": "n",
+              "operator": {
+                "type": "string",
+                "operation": "notEquals"
+              }
+            },
+            {
+              "id": "3cbcab63-87d4-451c-a256-b2e02f09c776",
+              "leftValue": "",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1056,
+        5072
+      ],
+      "id": "f1add181-62f9-4b4e-b1c4-503af6c5428e",
+      "name": "Proceso: Error Comando _"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "0XtwzTQFjnK50zSO",
+          "mode": "list",
+          "cachedResultName": "Base_Emergencia_Transacciones",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/0XtwzTQFjnK50zSO"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Transaccion": "={{ $('Extraer datos').item.json.text }}",
+            "fecha_ingreso": "={{ $('Extraer datos').item.json.date }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Transaccion",
+              "displayName": "Transaccion",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "fecha_ingreso",
+              "displayName": "fecha_ingreso",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "dateTime",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1056,
+        4768
+      ],
+      "id": "cc3eb94f-37a7-442c-913a-419764f1a32d",
+      "name": "Guardar Transacción"
+    },
+    {
+      "parameters": {
+        "chatId": "={{ $('Extraer datos').item.json['chat ID'] }}",
+        "text": "=Guardado de emergencia exitoso",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1312,
+        4768
+      ],
+      "id": "04f65141-86ac-4893-8cd5-7102ad3a0173",
+      "name": "Enviar mensaje guardado",
+      "webhookId": "22ab151f-04f0-48ad-b20b-1da80828dc71",
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Agregar gestión de tokens de los LLMs a la visualización en google sheets\n"
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -2192,
+        3024
+      ],
+      "typeVersion": 1,
+      "id": "9156c5ca-5cbb-4810-b49a-d3a2cde0382b",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## conectar base postgre a looker studio para ahí hacer mis visualizaciones\n\n",
+        "height": 176,
+        "width": 288
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -1920,
+        3024
+      ],
+      "typeVersion": 1,
+      "id": "072cda7f-0565-447d-9254-1b86acc82c5c",
+      "name": "Sticky Note2"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN ESPERA",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "or"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        448
+      ],
+      "id": "788a3901-713a-44c6-95a2-0ed52bee6881",
+      "name": "Proceso Contabilización"
+    },
+    {
+      "parameters": {},
+      "type": "n8n-nodes-base.noOp",
+      "name": "Replace Me2",
+      "typeVersion": 1,
+      "position": [
+        2304,
+        208
+      ],
+      "id": "5616e225-d157-4be8-bfa7-6a16c41d6c43"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitInBatches",
+      "typeVersion": 3,
+      "position": [
+        1872,
+        208
+      ],
+      "id": "86a53799-f181-4e61-a9b5-965fe16df098",
+      "name": "Iterar asientos1"
+    },
+    {
+      "parameters": {
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "asiento": "={{ $json.cuenta }}",
+            "State": "PENDIENTE"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "asiento",
+              "displayName": "asiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2096,
+        208
+      ],
+      "id": "8a8441ac-d9aa-48ff-97f9-d9c850b64f19",
+      "name": "Guardar asiento en caché1"
+    },
+    {
+      "parameters": {
+        "fieldToSplitOut": "data.asientos",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.splitOut",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        208
+      ],
+      "id": "7961c589-ad40-40a6-9038-170a4f680e21",
+      "name": "dividir asientos"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "asientos = _input.all()\n\n# 1. Extraemos los estados para contar\nestados = [fila.json.get(\"State\") for fila in asientos]\npendientes = estados.count(\"PENDIENTE\")\n\n# 2. Buscamos los datos del PRIMER asiento que esté \"Pendiente\"\n# Esto busca la primera fila completa (json) que cumpla la condición\nsiguiente = next((fila.json for fila in asientos if fila.json.get(\"State\") == \"PENDIENTE\"), None)\n\nreturn {\n    \"total_asientos\": len(asientos),\n    \"pendientes\": pendientes,\n    \"hay_trabajo\": pendientes > 0,\n    \"siguiente_asiento\": siguiente\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        1632,
+        1392
+      ],
+      "id": "829d465a-6f0a-4f73-abca-3e531ecf3a71",
+      "name": "Revisar asientos pendientes",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "29fbd6db-9cb8-4391-8822-9a86c20a05d8",
+              "leftValue": "={{ $json.hay_trabajo }}",
+              "rightValue": true,
+              "operator": {
+                "type": "boolean",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1840,
+        1392
+      ],
+      "id": "b1be9d8b-ad65-4176-9015-6ccfa2289be1",
+      "name": "¿Hay pendientes?"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "condition": "isNotEmpty"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        -576,
+        3504
+      ],
+      "id": "b5a96165-4cb0-4f28-a659-8cea27b3a35b",
+      "name": "Resetear asientos en caché",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "ContaBot_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Leer Estado').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN RECTIFICACION PREGUNTA"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1072,
+        3088
+      ],
+      "id": "448ef61d-54ab-4f00-9ef2-584d69f1ddd6",
+      "name": "Actualizar estado: En rectificación pregunta"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "ContaBot_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $('Leer Estado').item.json.id }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN REVISION"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2560,
+        448
+      ],
+      "id": "9732d96e-93b5-43d5-aefe-9c3005ee66ac",
+      "name": "Actualizar estado: En revisión"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN REVISION",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "62ac5b5e-4173-400e-ad70-071af0a7784e",
+              "leftValue": "={{ $('Telegram - Recibir Mensaje').item.json.message.text.toLowerCase() }}",
+              "rightValue": "y",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        1168
+      ],
+      "id": "e8ed43a8-c86b-4066-a2e8-3ceb2e2ee903",
+      "name": "Proceso Categorización confirmar iteración"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "EN CATEGORIZACION"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1008,
+        1168
+      ],
+      "id": "efce27a4-fe83-442c-92f1-129b9c1ad1ff",
+      "name": "Actualizar estado: En categorización"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1424,
+        1392
+      ],
+      "id": "1f68abd4-6f64-4d5d-a83c-9552151c64da",
+      "name": "Leer asientos en caché"
+    },
+    {
+      "parameters": {
+        "chatId": "2103298112",
+        "text": "=escriba c para iniciar iteración",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        1216,
+        1168
+      ],
+      "id": "b768bb80-b967-4533-94cc-c02ebe7a8675",
+      "name": "Preguntar inicio iteración",
+      "webhookId": "e0a6ce7a-bc64-431c-a927-4bd84b7d64ee",
+      "alwaysOutputData": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "EN CATEGORIZACION",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        784,
+        1392
+      ],
+      "id": "9ac4f276-3b4b-49e7-8fd5-220dc6d445cd",
+      "name": "Proceso Categorización: bucle"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "={{ $json.siguiente_asiento.id }}"
+            }
+          ]
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        1248
+      ],
+      "id": "0db8af1e-d7c4-4a3c-afa7-d780765384b5",
+      "name": "Leer primer pendiente"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "493f7991-05b7-46e9-8a4f-5c14a24a7181",
+              "leftValue": "={{ $('Telegram - Recibir Mensaje').item.json.callback_query }}",
+              "rightValue": "",
+              "operator": {
+                "type": "object",
+                "operation": "exists",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        1008,
+        1392
+      ],
+      "id": "8ae39d11-c2e9-4b70-afd0-20777596627e",
+      "name": "¿Es calback query?"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8510847874:AAGf-BrwYhCoP6dIsTlK-QNbUA99kLGwXNc/answerCallbackQuery",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={ \"callback_query_id\": \"{{ $('Telegram - Recibir Mensaje').item.json.callback_query.id }}\", \"text\": \"¡Categoría guardada!\" }",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1008,
+        1600
+      ],
+      "id": "fa39bb7f-ef31-4a74-a85b-bce62624367e",
+      "name": "Responder Callback Query",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8510847874:AAGf-BrwYhCoP6dIsTlK-QNbUA99kLGwXNc/editMessageText",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={\n  \"chat_id\": {{ $('Telegram - Recibir Mensaje').item.json.callback_query.message.chat.id }},\n  \"message_id\": {{ $('Telegram - Recibir Mensaje').item.json.callback_query.message.message_id }},\n  \"text\": \"✅ **Asiento categorizado**\\n\\nTipo: {{ $('Telegram - Recibir Mensaje').item.json.callback_query.data }} \\nEstado: Guardado en base de datos.\",\n  \"parse_mode\": \"Markdown\",\n  \"reply_markup\": {\n    \"inline_keyboard\": []\n  }\n}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        1216,
+        1600
+      ],
+      "id": "9ff2724d-0d1b-48c6-9978-ef4be4caadf5",
+      "name": "Eliminar vista formulario",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "eb3ca86d-6779-4c26-a526-59db0cf857c2",
+              "name": "respuesta",
+              "value": "={{ $('Telegram - Recibir Mensaje').item.json.callback_query }}",
+              "type": "object"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1424,
+        1600
+      ],
+      "id": "b5d352a2-5069-40b6-897f-39b745eeb5d0",
+      "name": "Extraer Callback Query",
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "matchType": "allConditions",
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "asiento",
+              "keyValue": "={{ $json.respuesta.message.text.split(' ').pop() }}"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "categoria": "={{ $json.respuesta.data }}",
+            "State": "COMPLETADO"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "asiento",
+              "displayName": "asiento",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": true
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            },
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1632,
+        1600
+      ],
+      "id": "ca16e8c2-7a2a-4df3-a5ae-991adf32ce5b",
+      "name": "Guardar Categoría Asiento"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2208,
+        1552
+      ],
+      "id": "a8827d9c-7a6f-4371-891d-d30ea4d385b5",
+      "name": "Leer asientos categorizados"
+    },
+    {
+      "parameters": {
+        "aggregate": "aggregateAllItemData",
+        "include": "specifiedFields",
+        "fieldsToInclude": "asiento, categoria, State",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.aggregate",
+      "typeVersion": 1,
+      "position": [
+        2416,
+        1552
+      ],
+      "id": "c3565d69-5e72-4213-b863-3b3fb41d674b",
+      "name": "Unir categorizaciones"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "5lEvkQNU1jEVZU9O",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_Original_Cache",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/5lEvkQNU1jEVZU9O"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        }
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2624,
+        1552
+      ],
+      "id": "48409091-1623-4dff-8200-71c8d16cc224",
+      "name": "Leer texto original"
+    },
+    {
+      "parameters": {
+        "chatId": "2103298112",
+        "text": "=Estado final Transacción\n\n✅ Texto original:\n{{ $('Leer texto original').item.json.texto_original }}\n\n✅ Categorización:\n{{ \n$('Unir categorizaciones').item.json.data\n  .map(i => `• ${i.asiento} | ${i.categoria} | ${i.State}`)\n  .join('\\n')\n}}\n\n¿Deseas registrar esta transacción en la base de datos? (y/n)",
+        "additionalFields": {
+          "appendAttribution": false
+        }
+      },
+      "type": "n8n-nodes-base.telegram",
+      "typeVersion": 1.2,
+      "position": [
+        3056,
+        1552
+      ],
+      "id": "a1906c2b-8960-4759-8061-6bc8f2b686fa",
+      "name": "Pedir aprobación final",
+      "webhookId": "e0a6ce7a-bc64-431c-a927-4bd84b7d64ee",
+      "alwaysOutputData": false,
+      "credentials": {
+        "telegramApi": {
+          "id": "VXaEAkoWSVOpQW3J",
+          "name": "Telegram - ContaBot"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "update",
+        "dataTableId": {
+          "__rl": true,
+          "value": "nnoDKCa5w9EoRasi",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_State_Control",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/nnoDKCa5w9EoRasi"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyValue": "1"
+            }
+          ]
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "State": "REVISION FINAL"
+          },
+          "matchingColumns": [
+            "State"
+          ],
+          "schema": [
+            {
+              "id": "State",
+              "displayName": "State",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "readOnly": false,
+              "removed": false
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        2832,
+        1552
+      ],
+      "id": "8bc68cdd-e313-4cf9-b53c-074541465a83",
+      "name": "Actualizar estado: Revisión final"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 2
+          },
+          "conditions": [
+            {
+              "id": "39dc8565-153e-479b-b5d8-5084c9a26e97",
+              "leftValue": "={{ $json.State }}",
+              "rightValue": "REVISION FINAL",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "70d6f0ab-4fc2-459e-93b4-4ba188275f4d",
+              "leftValue": "={{ $('Extraer datos').item.json.text }}",
+              "rightValue": "y",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.2,
+      "position": [
+        800,
+        2320
+      ],
+      "id": "323fc754-6785-41b2-a9d8-798b948344fe",
+      "name": "Proceso Registro"
+    },
+    {
+      "parameters": {
+        "operation": "get",
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "returnAll": true
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        1040,
+        2320
+      ],
+      "id": "2750cd8a-bae2-47a3-8813-6748baff2f37",
+      "name": "Leer asientos categorizados1"
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "items = _('Fusionar ID transacción a asientos').all()\ncategorizados = _('Leer asientos categorizados1').all()\n\n# asientos\nasientos = [item['json'] for item in items]\n\n# índice asiento -> categoría\ncat_index = {\n    item['json']['asiento']: item['json']['categoria']\n    for item in categorizados\n}\n\n# merge\nfor asiento in asientos:\n    asiento['cat'] = cat_index.get(asiento['cuenta'])\n\nreturn asientos"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        2144,
+        2320
+      ],
+      "id": "10a74089-4749-4f3f-bf4a-b7046a9f23fb",
+      "name": "Agregar categoría a asientos"
+    },
+    {
+      "parameters": {
+        "schema": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "list",
+          "cachedResultName": "contabilidad"
+        },
+        "table": {
+          "__rl": true,
+          "value": "asientos",
+          "mode": "list",
+          "cachedResultName": "asientos"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "transaccion_id": "={{ $json.id_trans }}",
+            "cuenta_codigo": "={{ $json.cuenta }}",
+            "lado": "={{ $json.lado }}",
+            "monto": "={{ $json.monto }}",
+            "categoria": "={{ $json.cat }}"
+          },
+          "matchingColumns": [
+            "id"
+          ],
+          "schema": [
+            {
+              "id": "id",
+              "displayName": "id",
+              "required": false,
+              "defaultMatch": true,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true,
+              "removed": true
+            },
+            {
+              "id": "transaccion_id",
+              "displayName": "transaccion_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "cuenta_codigo",
+              "displayName": "cuenta_codigo",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "lado",
+              "displayName": "lado",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "monto",
+              "displayName": "monto",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "number",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "categoria",
+              "displayName": "categoria",
+              "required": true,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        2672,
+        2384
+      ],
+      "id": "a0382b9c-cb3d-4d80-8bea-461c9b88b0a3",
+      "name": "Registrar Asientos",
+      "alwaysOutputData": true,
+      "credentials": {
+        "postgres": {
+          "id": "wSD7a2Y8Y1d5TlRy",
+          "name": "Postgres account Local"
+        }
+      },
+      "onError": "continueErrorOutput"
+    },
+    {
+      "parameters": {
+        "operation": "deleteRows",
+        "dataTableId": {
+          "__rl": true,
+          "value": "TykAZ6Lbcg6161ym",
+          "mode": "list",
+          "cachedResultName": "CONTABOT_storage_asientos",
+          "cachedResultUrl": "/projects/fEZ5Syjz42u4XlWI/datatables/TykAZ6Lbcg6161ym"
+        },
+        "filters": {
+          "conditions": [
+            {
+              "keyName": "State",
+              "keyValue": "COMPLETADO"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.dataTable",
+      "typeVersion": 1,
+      "position": [
+        3472,
+        2320
+      ],
+      "id": "1c6db842-7f06-4d1d-a0cf-65214c99f771",
+      "name": "Resetear asientos"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en enviar respuesta a contabot por la elección de categoría",
+              "type": "string"
+            },
+            {
+              "id": "0770ceb3-4798-47e2-aa2d-6cb5e7e37fad",
+              "name": "Proceso",
+              "value": "Proceso Categorización bucle - Responder Callback Query",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1312,
+        1904
+      ],
+      "id": "aba6c21e-b3a4-48c8-a12b-b0045b0600e3",
+      "name": "Error: Respuesta Callback Query"
+    },
+    {
+      "parameters": {
+        "amount": 2
+      },
+      "type": "n8n-nodes-base.wait",
+      "typeVersion": 1.1,
+      "position": [
+        1840,
+        1600
+      ],
+      "id": "43df9f85-8e1d-46de-99b5-3ec7381b8159",
+      "name": "Dar tiempo a update",
+      "webhookId": "e5329e68-d79c-43b1-a718-a7d16044b564"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en enviar instrucción de eliminar formulario a contabot",
+              "type": "string"
+            },
+            {
+              "id": "0770ceb3-4798-47e2-aa2d-6cb5e7e37fad",
+              "name": "Proceso",
+              "value": "Proceso Categorización bucle - Eliminar vista formulario",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1552,
+        1904
+      ],
+      "id": "06a44646-a3af-4572-8be4-78687fe582c2",
+      "name": "Error: Eliminar vista formulario"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en extraer el callback query de la respuesta",
+              "type": "string"
+            },
+            {
+              "id": "0770ceb3-4798-47e2-aa2d-6cb5e7e37fad",
+              "name": "Proceso",
+              "value": "Proceso Categorización bucle - Extraer Callback Query",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        1776,
+        1904
+      ],
+      "id": "3053807c-812c-4c06-917b-6b97b0636fc7",
+      "name": "Error: Extraer Callback Query"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en revisar los asientos pendientes durante categorización",
+              "type": "string"
+            },
+            {
+              "id": "0770ceb3-4798-47e2-aa2d-6cb5e7e37fad",
+              "name": "Proceso",
+              "value": "Proceso Categorización bucle - Revisar asientos pendientes",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2048,
+        1904
+      ],
+      "id": "9d7acc90-d690-4f5f-8250-7219a9b9d1fe",
+      "name": "Error: Revisar asientos pendientes"
+    },
+    {
+      "parameters": {
+        "assignments": {
+          "assignments": [
+            {
+              "id": "b3f0b087-3979-46e5-89f6-ca223aa3494b",
+              "name": "Error",
+              "value": "⚠️ Error en llamar a subproceso de categorización de asientos",
+              "type": "string"
+            },
+            {
+              "id": "0770ceb3-4798-47e2-aa2d-6cb5e7e37fad",
+              "name": "Proceso",
+              "value": "Proceso Categorización bucle - Llamar subproceso categorizador",
+              "type": "string"
+            },
+            {
+              "id": "67bb986a-d690-4c24-a1a9-f31e44442b25",
+              "name": "Traceback",
+              "value": "={{ $json.error }}",
+              "type": "string"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.set",
+      "typeVersion": 3.4,
+      "position": [
+        2848,
+        1904
+      ],
+      "id": "3d1b65dd-82f6-4f3a-8d5f-e360d7e3d6de",
+      "name": "Error: Llamar subproceso categorizador"
+    },
+    {
+      "parameters": {
+        "content": "# Contabilización\n",
+        "height": 880,
+        "width": 2144,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        144
+      ],
+      "typeVersion": 1,
+      "id": "ba228a7d-a5ee-4d70-ad3c-ea8eeae8194c",
+      "name": "Sticky Note3"
+    },
+    {
+      "parameters": {
+        "content": "# Categorización\n",
+        "height": 1072,
+        "width": 2608,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        1056
+      ],
+      "typeVersion": 1,
+      "id": "330f0319-465d-4132-a869-e8eb97d7f95a",
+      "name": "Sticky Note4"
+    },
+    {
+      "parameters": {
+        "content": "# Registro\n",
+        "height": 768,
+        "width": 3072,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        2160
+      ],
+      "typeVersion": 1,
+      "id": "ce5010dc-e331-4320-9b0e-1ecf4049f521",
+      "name": "Sticky Note5"
+    },
+    {
+      "parameters": {
+        "content": "# Rectificación\n",
+        "height": 1680,
+        "width": 2432,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        2960
+      ],
+      "typeVersion": 1,
+      "id": "a6fbae17-e3c5-4060-bd76-b8351c791423",
+      "name": "Sticky Note6"
+    },
+    {
+      "parameters": {
+        "content": "# Guardado de Emergencia\n",
+        "height": 272,
+        "width": 832,
+        "color": 7
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        688,
+        4672
+      ],
+      "typeVersion": 1,
+      "id": "032a8f05-55c1-460a-90f8-babbec354f0d",
+      "name": "Sticky Note7"
+    },
+    {
+      "parameters": {
+        "content": "# Gestión de Errores\n",
+        "height": 464,
+        "width": 944,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        576,
+        4976
+      ],
+      "typeVersion": 1,
+      "id": "a8a3a633-bc5d-4e2a-a366-8f4fe407de6a",
+      "name": "Sticky Note8"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "j5gb1tV26PpstbHI",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/j5gb1tV26PpstbHI",
+          "cachedResultName": "Subprocess: categorizador de asientos"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {}
+        },
+        "mode": "each",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        2416,
+        1248
+      ],
+      "id": "795ea9e6-431c-4f0e-a0b6-30394d65316e",
+      "name": "Call 'Subprocess: categorizador de asientos'",
+      "onError": "continueErrorOutput"
+    }
+  ],
+  "pinData": {
+    "Telegram - Recibir Mensaje": [
+      {
+        "json": {
+          "update_id": 127918666,
+          "message": {
+            "message_id": 789,
+            "from": {
+              "id": 2103298112,
+              "is_bot": false,
+              "first_name": "Renato",
+              "last_name": "Catalán",
+              "username": "Rcatalanca",
+              "language_code": "es"
+            },
+            "chat": {
+              "id": 2103298112,
+              "first_name": "Renato",
+              "last_name": "Catalán",
+              "username": "Rcatalanca",
+              "type": "private"
+            },
+            "date": 1770149618,
+            "text": "y"
+          }
+        }
+      }
+    ]
+  },
+  "connections": {
+    "Extraer datos": {
+      "main": [
+        [
+          {
+            "node": "¿Continuar?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer Estado": {
+      "main": [
+        [
+          {
+            "node": "Proceso Contabilización",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Categorización confirmar iteración",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Rectificación: pregunta",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso: Error comando",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Rectificación: Pedir sugerencias",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Rectificación: Rectificar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Rectificación: Abortar",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Guardado Emergencia",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Categorización: bucle",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "Proceso Registro",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Telegram - Recibir Mensaje": {
+      "main": [
+        [
+          {
+            "node": "Extraer datos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google LLM1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Contabilizador de Transacción",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar caché respuesta": {
+      "main": [
+        [
+          {
+            "node": "Actualizar caché texto original",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer caché respuesta": {
+      "main": [
+        [
+          {
+            "node": "Estructurar Respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Google LLM2": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Reparador de Transacción",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer caché respuesta1": {
+      "main": [
+        [
+          {
+            "node": "Estructurar Respuesta2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructurar Respuesta": {
+      "main": [
+        [
+          {
+            "node": "Registrar Transacción",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Estructuración respuesta caché",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Rectificación: pregunta": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: En rectificación pregunta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Rectificación: Pedir sugerencias": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: En rectificación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Rectificación: Rectificar": {
+      "main": [
+        [
+          {
+            "node": "Leer caché texto original",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar caché texto original": {
+      "main": [
+        [
+          {
+            "node": "Pedir aprobación usuario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer caché texto original": {
+      "main": [
+        [
+          {
+            "node": "Leer caché respuesta1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Continuar?": {
+      "main": [
+        [
+          {
+            "node": "Leer Estado",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Resetear estado: En espera",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resetear estado: En espera": {
+      "main": [
+        [
+          {
+            "node": "Resetear asientos en caché",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar estado: volver a revisión": {
+      "main": [
+        [
+          {
+            "node": "Mostrar nuevo JSON y pedir aprobación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar estado: En rectificación": {
+      "main": [
+        [
+          {
+            "node": "Pedir rectificaciones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Rectificación: Abortar": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: En espera1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar estado: En espera1": {
+      "main": [
+        [
+          {
+            "node": "Leer caché texto original1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer caché texto original1": {
+      "main": [
+        [
+          {
+            "node": "Leer caché respuesta2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer caché respuesta2": {
+      "main": [
+        [
+          {
+            "node": "Guardar Transacción Fallida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Transacción Fallida": {
+      "main": [
+        [
+          {
+            "node": "Enviar mensaje de conclusión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: guardado transacción fallida",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Fusionar ID transacción a asientos": {
+      "main": [
+        [
+          {
+            "node": "Agregar categoría a asientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Loop Over Items": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: En espera",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Registrar Asientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar estado: En espera": {
+      "main": [
+        [
+          {
+            "node": "Enviar mensaje de registro exitoso",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: fallo contabilizador": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: limpieza JSON contabilizador": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: validación JSON contabilizador": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Envío mensaje de aprobación": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Estructuración respuesta caché": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Registro Transacción": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Registro asientos": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpiar respuesta reparador": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: volver a revisión",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Limpiar respuesta contabilizador": {
+      "main": [
+        [
+          {
+            "node": "¿Es JSON válido?",
+            "type": "main",
+            "index": 0
+          },
+          {
+            "node": "dividir asientos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: limpieza JSON contabilizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Estructurar Respuesta2": {
+      "main": [
+        [
+          {
+            "node": "Reparador de Transacción",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Estructuración respuesta caché1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Mostrar nuevo JSON y pedir aprobación": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Error: Envío mensaje de aprobación rectificación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: fallo reparador": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Contabilizador de Transacción": {
+      "main": [
+        [
+          {
+            "node": "Limpiar respuesta contabilizador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: fallo contabilizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es JSON válido?": {
+      "main": [
+        [
+          {
+            "node": "Actualizar caché respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: validación JSON contabilizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Pedir aprobación usuario": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: En revisión",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Envío mensaje de aprobación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Transacción": {
+      "main": [
+        [
+          {
+            "node": "Fusionar ID transacción a asientos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Registro Transacción",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Reparador de Transacción": {
+      "main": [
+        [
+          {
+            "node": "Limpiar respuesta reparador",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: fallo reparador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Estructuración respuesta caché1": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Envío mensaje de aprobación rectificación": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: guardado transacción fallida": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar mensaje de registro exitoso": {
+      "main": [
+        [
+          {
+            "node": "Resetear asientos",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Envío mensaje de éxito",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Envío mensaje de éxito": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar Mensaje Error": {
+      "main": [
+        [
+          {
+            "node": "Enviar mensaje pregunta base emergencia",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso: Error comando": {
+      "main": [
+        [
+          {
+            "node": "Proceso: Error Comando _",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso: Error Comando _": {
+      "main": [
+        [
+          {
+            "node": "Enviar mensaje: comando desconocido",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Guardado Emergencia": {
+      "main": [
+        [
+          {
+            "node": "Guardar Transacción",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Transacción": {
+      "main": [
+        [
+          {
+            "node": "Enviar mensaje guardado",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Contabilización": {
+      "main": [
+        [
+          {
+            "node": "Contabilizador de Transacción",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Replace Me2": {
+      "main": [
+        [
+          {
+            "node": "Iterar asientos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Iterar asientos1": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Guardar asiento en caché1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar asiento en caché1": {
+      "main": [
+        [
+          {
+            "node": "Replace Me2",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "dividir asientos": {
+      "main": [
+        [
+          {
+            "node": "Iterar asientos1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Revisar asientos pendientes": {
+      "main": [
+        [
+          {
+            "node": "¿Hay pendientes?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Revisar asientos pendientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resetear asientos en caché": {
+      "main": [
+        [
+          {
+            "node": "Enviar mensaje terminación",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Hay pendientes?": {
+      "main": [
+        [
+          {
+            "node": "Leer primer pendiente",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Leer asientos categorizados",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar estado: En rectificación pregunta": {
+      "main": [
+        [
+          {
+            "node": "Preguntar si hacer cambios o abortar",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar estado: En revisión": {
+      "main": [
+        []
+      ]
+    },
+    "Proceso Categorización confirmar iteración": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: En categorización",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        []
+      ]
+    },
+    "Actualizar estado: En categorización": {
+      "main": [
+        [
+          {
+            "node": "Preguntar inicio iteración",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer asientos en caché": {
+      "main": [
+        [
+          {
+            "node": "Revisar asientos pendientes",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Categorización: bucle": {
+      "main": [
+        [
+          {
+            "node": "¿Es calback query?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer primer pendiente": {
+      "main": [
+        [
+          {
+            "node": "Call 'Subprocess: categorizador de asientos'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "¿Es calback query?": {
+      "main": [
+        [
+          {
+            "node": "Responder Callback Query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Leer asientos en caché",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Responder Callback Query": {
+      "main": [
+        [
+          {
+            "node": "Eliminar vista formulario",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Respuesta Callback Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Eliminar vista formulario": {
+      "main": [
+        [
+          {
+            "node": "Extraer Callback Query",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Eliminar vista formulario",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer Callback Query": {
+      "main": [
+        [
+          {
+            "node": "Guardar Categoría Asiento",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Extraer Callback Query",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Guardar Categoría Asiento": {
+      "main": [
+        [
+          {
+            "node": "Dar tiempo a update",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer asientos categorizados": {
+      "main": [
+        [
+          {
+            "node": "Unir categorizaciones",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Unir categorizaciones": {
+      "main": [
+        [
+          {
+            "node": "Leer texto original",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer texto original": {
+      "main": [
+        [
+          {
+            "node": "Actualizar estado: Revisión final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Actualizar estado: Revisión final": {
+      "main": [
+        [
+          {
+            "node": "Pedir aprobación final",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Proceso Registro": {
+      "main": [
+        [
+          {
+            "node": "Leer asientos categorizados1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Leer asientos categorizados1": {
+      "main": [
+        [
+          {
+            "node": "Leer caché respuesta",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Agregar categoría a asientos": {
+      "main": [
+        [
+          {
+            "node": "Loop Over Items",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Registrar Asientos": {
+      "main": [
+        [
+          {
+            "node": "Replace Me",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Error: Registro asientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Resetear asientos": {
+      "main": [
+        []
+      ]
+    },
+    "Dar tiempo a update": {
+      "main": [
+        [
+          {
+            "node": "Leer asientos en caché",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Respuesta Callback Query": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Eliminar vista formulario": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Extraer Callback Query": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Revisar asientos pendientes": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Error: Llamar subproceso categorizador": {
+      "main": [
+        [
+          {
+            "node": "Enviar Mensaje Error",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Call 'Subprocess: categorizador de asientos'": {
+      "main": [
+        [],
+        [
+          {
+            "node": "Error: Llamar subproceso categorizador",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "timezone": "America/Santiago",
+    "callerPolicy": "workflowsFromSameOwner",
+    "availableInMCP": false
+  },
+  "versionId": "45ff3a2a-16cc-43a1-8c25-6238efbdd37a",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "824684a64c9516ccd4f2a53cc883616c17e32226214e60fb09979839490e6295"
+  },
+  "id": "tWtfpczVPrEzkxXe",
+  "tags": []
+}

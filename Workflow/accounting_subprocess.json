@@ -1,0 +1,177 @@
+{
+  "name": "Subprocess: categorizador de asientos",
+  "nodes": [
+    {
+      "parameters": {
+        "inputSource": "passthrough"
+      },
+      "type": "n8n-nodes-base.executeWorkflowTrigger",
+      "typeVersion": 1.1,
+      "position": [
+        0,
+        0
+      ],
+      "id": "b5c291d8-86ee-4e40-bcf7-f55bda6ff865",
+      "name": "When Executed by Another Workflow"
+    },
+    {
+      "parameters": {
+        "operation": "select",
+        "schema": {
+          "__rl": true,
+          "value": "contabilidad",
+          "mode": "list",
+          "cachedResultName": "contabilidad"
+        },
+        "table": {
+          "__rl": true,
+          "value": "cat_asientos",
+          "mode": "list",
+          "cachedResultName": "cat_asientos"
+        },
+        "limit": 10,
+        "where": {
+          "values": [
+            {
+              "column": "codigo_asiento",
+              "value": "={{ $json.asiento }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.postgres",
+      "typeVersion": 2.6,
+      "position": [
+        208,
+        0
+      ],
+      "id": "7315581d-0998-4f70-b0a8-b7013dd6d06d",
+      "name": "Leer Categorías de Asiento",
+      "credentials": {
+        "postgres": {
+          "id": "wSD7a2Y8Y1d5TlRy",
+          "name": "Postgres account Local"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "language": "python",
+        "pythonCode": "# 1. Obtenemos todos los items que llegan del nodo anterior\nitems = _input.all()\nasiento = _input.first().json.codigo_asiento\n\n# 2. Extraemos el nombre de la categoría de cada item\n# Asumiendo que el campo se llama \"categoria\" en el nodo anterior\ncategorias = [item.json.categoria for item in items]\n\n# 3. Generamos la estructura de botones (una fila por cada categoría)\ninline_keyboard = []\nfor cat in categorias:\n    # Telegram requiere que cada fila sea una lista []\n    boton = {\n        \"text\": str(cat), \n        \"callback_data\": str(cat)[:64] # Límite de 64 caracteres\n    }\n    inline_keyboard.append([boton])\n\n# generar texto de categoría de asiento a seleccionar\ntexto = f\"Seleccionar tipo de {asiento}\"\n\n# 4. Retornamos el objeto final para el nodo HTTP Request\n# Usamos [0] para que n8n devuelva un solo objeto de salida\nreturn {\n    \"payload\": {\n        \"chat_id\": 2103298112,\n        \"text\": texto,\n        \"reply_markup\": {\n            \"inline_keyboard\": inline_keyboard\n        }\n    }\n}"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        416,
+        0
+      ],
+      "id": "39c70d7a-cf34-4bb2-b852-5f0dcaa74eeb",
+      "name": "Extraer categorías asientos"
+    },
+    {
+      "parameters": {
+        "method": "POST",
+        "url": "https://api.telegram.org/bot8510847874:AAGf-BrwYhCoP6dIsTlK-QNbUA99kLGwXNc/sendMessage",
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "={{ JSON.stringify($json.payload) }}",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.httpRequest",
+      "typeVersion": 4.3,
+      "position": [
+        624,
+        0
+      ],
+      "id": "1d77fa6f-76cd-45c9-bbaa-7d9ef0a567ab",
+      "name": "Enviar categorías asientos"
+    },
+    {
+      "parameters": {
+        "workflowId": {
+          "__rl": true,
+          "value": "tWtfpczVPrEzkxXe",
+          "mode": "list",
+          "cachedResultUrl": "/workflow/tWtfpczVPrEzkxXe",
+          "cachedResultName": "Contabilidad Automática"
+        },
+        "workflowInputs": {
+          "mappingMode": "defineBelow",
+          "value": {},
+          "matchingColumns": [],
+          "schema": [],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": true
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.executeWorkflow",
+      "typeVersion": 1.3,
+      "position": [
+        832,
+        0
+      ],
+      "id": "983545c7-f1ab-4e23-a242-f2581abd3023",
+      "name": "Call 'Contabilidad Automática'"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Leer Categorías de Asiento": {
+      "main": [
+        [
+          {
+            "node": "Extraer categorías asientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "When Executed by Another Workflow": {
+      "main": [
+        [
+          {
+            "node": "Leer Categorías de Asiento",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Extraer categorías asientos": {
+      "main": [
+        [
+          {
+            "node": "Enviar categorías asientos",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Enviar categorías asientos": {
+      "main": [
+        [
+          {
+            "node": "Call 'Contabilidad Automática'",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "660702e2-b231-4d36-b457-ed74440063d5",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "824684a64c9516ccd4f2a53cc883616c17e32226214e60fb09979839490e6295"
+  },
+  "id": "j5gb1tV26PpstbHI",
+  "tags": []
+}
